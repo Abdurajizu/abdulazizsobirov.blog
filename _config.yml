@@ -59,6 +59,7 @@ header_pages:
   - resume.markdown
 
 exclude:
+  - about_me.md
   - CLAUDE.md
 
 # Exclude from processing.

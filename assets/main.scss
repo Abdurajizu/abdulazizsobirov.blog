@@ -544,6 +544,23 @@ ul, ol { padding-left: 1.3rem; }
 li { margin-bottom: 0.35rem; }
 
 // ---------------------------------------------------------------------------
+// Courses on the About page
+.courses {
+  margin: 0 0 $step;
+
+  dt {
+    margin-top: 0.9rem;
+    font-family: $font-display;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  dd { margin: 0.2rem 0 0; }
+}
+
 // Post list (Home and Writing)
 // ---------------------------------------------------------------------------
 
