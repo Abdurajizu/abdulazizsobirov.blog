@@ -1,0 +1,8 @@
+<footer class="footer">
+  {% include social.html %}
+  <p>
+    &copy; {{ site.time | date: "%Y" }} {{ site.title | escape }}
+    {%- if site.email %} &middot; <a href="mailto:{{ site.email }}">{{ site.email }}</a>{%- endif %}
+    &middot; <a href="{{ '/feed.xml' | relative_url }}">RSS</a>
+  </p>
+</footer>

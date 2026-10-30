@@ -1,0 +1,65 @@
+{%- comment -%}
+One research entry. Expects: entry (a document from _research), index (unique
+number for the details toggle's id).
+{%- endcomment -%}
+{%- assign entry = include.entry -%}
+{%- assign detail = entry.content | strip -%}
+<article class="entry{% if entry.media %} entry--media{% endif %}">
+  <div class="entry-main">
+    <h3 class="entry-title">{{ entry.title }}</h3>
+
+    {%- if entry.venue %}
+    <p class="entry-venue">{{ entry.venue }}</p>
+    {%- endif %}
+
+    {%- if entry.summary %}
+    <p class="entry-summary">{{ entry.summary }}</p>
+    {%- endif %}
+
+    {%- if detail != "" %}
+    <button type="button" class="entry-toggle" aria-expanded="false" aria-controls="entry-detail-{{ include.index }}">
+      <svg class="entry-chevron" viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+        <path d="M3 4.5 6 7.5 9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="entry-toggle-label">Details</span>
+    </button>
+
+    <div class="entry-detail" id="entry-detail-{{ include.index }}">
+      <div class="entry-detail-inner">{{ detail | markdownify }}</div>
+    </div>
+    {%- endif %}
+
+    {%- if entry.links %}
+    <ul class="entry-links">
+      {%- for link in entry.links %}
+      <li><a href="{{ link.url }}" rel="noopener noreferrer" target="_blank">{{ link.label }}
+        <svg class="entry-link-arrow" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
+          <path d="M2.5 7.5 7.5 2.5M3.6 2.5h3.9v3.9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a></li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+
+    {%- if entry.tags %}
+    <ul class="entry-tags">
+      {%- for tag in entry.tags %}<li>{{ tag }}</li>{% endfor -%}
+    </ul>
+    {%- endif %}
+  </div>
+
+  {%- if entry.media %}
+  <figure class="entry-media">
+    {%- if entry.media.type == "video" %}
+    <video class="entry-video" muted loop playsinline preload="metadata"
+           {% if entry.media.poster %}poster="{{ entry.media.poster | relative_url }}"{% endif %}>
+      <source src="{{ entry.media.src | relative_url }}" type="{{ entry.media.mime | default: 'video/mp4' }}">
+    </video>
+    <span class="entry-media-hint" aria-hidden="true">hover to play</span>
+    {%- else %}
+    <img src="{{ entry.media.src | relative_url }}" alt="{{ entry.media.alt | default: entry.title }}" loading="lazy" decoding="async">
+    {%- endif %}
+    {%- if entry.media.caption %}<figcaption>{{ entry.media.caption }}</figcaption>{% endif %}
+  </figure>
+  {%- endif %}
+</article>

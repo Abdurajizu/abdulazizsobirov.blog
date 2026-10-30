@@ -18,21 +18,45 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: Your awesome title
-email: your-email@example.com
+title: Abdulaziz Sobirov
+email: abdulazizs07.10g@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
+  Personal site of Abdulaziz Sobirov.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
-github_username:  jekyll
+url: "https://abdulazizsobirov.com"
+# Profile links. Rendered by _includes/social.html (About page and footer).
+social:
+  linkedin: https://www.linkedin.com/in/abdulaziz-sobirov-150407amc/
+  github: https://github.com/Abdurajizu
+  x: https://x.com/abdulaz31936438
 
 # Build settings
-theme: minima
+# Post URLs, e.g. /writing/my-post/. Without this, Jekyll builds them from the
+# post's categories (/jekyll/update/2026/10/29/my-post.html).
+permalink: /writing/:title/
+
+# No theme gem: layouts, includes and styles live in this repo
+# (_layouts/, _includes/, assets/main.scss).
 plugins:
   - jekyll-feed
+
+sass:
+  sourcemap: never
+
+# Research entries: one file per item in _research/. Rendered as a list on
+# /research/, so they get no pages of their own.
+collections:
+  research:
+    output: false
+
+# Order of the links in the site header.
+header_pages:
+  - index.markdown
+  - about.markdown
+  - projects.markdown
+  - research.markdown
+  - writing.markdown
+  - resume.markdown
 
 exclude:
   - CLAUDE.md

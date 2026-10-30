@@ -1,0 +1,1017 @@
+---
+# Front matter below is required so Jekyll processes this file.
+---
+
+// ---------------------------------------------------------------------------
+// Theme tokens. Colours are CSS custom properties so dark mode can swap them.
+// ---------------------------------------------------------------------------
+
+$font-body: "Libre Baskerville", Georgia, "Times New Roman", serif;
+$font-display: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+$font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+$measure: 40rem; // text column width
+$step: 1.6rem;   // vertical rhythm
+$ease: cubic-bezier(0.4, 0, 0.2, 1);
+$fade: 0.6s;     // day/night crossfade
+
+// Light: warm cream white.
+:root[data-theme="light"] {
+  --bg: #fcf5e8;
+  --bg-raised: #fffbf1;
+  --text: #1f1a13;
+  --muted: #6b5e4d;
+  --rule: #e8dbc3;
+  --link: #8a5a2b;
+  --code-bg: #f3e9d3;
+  --shadow: rgba(60, 42, 24, 0.12);
+  --hover: #f1e4cc;
+}
+
+// Dark: cool slate, deliberately not a brown.
+:root[data-theme="dark"] {
+  --bg: #13161b;
+  --bg-raised: #1a1e25;
+  --text: #e4e7ea;
+  --muted: #959da8;
+  --rule: #272d35;
+  --link: #e0a06a;
+  --code-bg: #1b2028;
+  --shadow: rgba(0, 0, 0, 0.55);
+  --hover: #1f242c;
+}
+
+// Day/night crossfade. Held back until JS adds .theme-ready so the first
+// paint does not animate.
+.theme-ready {
+  body, .masthead, .masthead-inner, .footer, .palette, .palette-hint, pre, code,
+  blockquote, th, td, hr, .post-list > li, .post-back {
+    transition: background-color $fade $ease,
+                color $fade $ease,
+                border-color $fade $ease,
+                box-shadow $fade $ease;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Page transitions
+// ---------------------------------------------------------------------------
+
+// Every page fades its content in on load. This is the baseline that always
+// runs: a cross-document view transition can be skipped by the browser for
+// reasons we don't control (the new document taking too long to first paint,
+// back/forward navigation, a second click landing mid-transition), and when
+// it is skipped there is no event and no fallback — the page just cuts. So
+// the fade lives here, unconditionally, rather than behind an @supports gate.
+.content { animation: page-in 0.32s $ease both; }
+
+// Cross-document view transitions on top, where supported. Browsers that
+// don't understand this ignore it and navigate as normal.
+@view-transition { navigation: auto; }
+
+// The masthead is named, so it stays put while the content crossfades.
+.masthead { view-transition-name: masthead; }
+
+// Opacity only: the vertical travel comes from .content in both paths, so a
+// view transition and the baseline fade don't stack into a double slide.
+::view-transition-old(root) { animation: root-out 0.22s $ease both; }
+::view-transition-new(root) { animation: root-in 0.28s $ease both; }
+
+@keyframes root-out { to { opacity: 0; } }
+@keyframes root-in { from { opacity: 0; } }
+
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(7px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // `*` never matches the ::view-transition pseudo tree, so opt out at the
+  // source instead of trying to zero its durations.
+  @view-transition { navigation: none; }
+
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Base
+// ---------------------------------------------------------------------------
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  // Sticky footer: the page is always at least a full viewport tall and the
+  // content column takes up any slack, so the footer never floats mid-screen.
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0 1.25rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: $font-body;
+  font-size: 0.975rem;
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: color 0.25s $ease, opacity 0.25s $ease;
+
+  &:hover { text-decoration: none; opacity: 0.78; }
+}
+
+img { max-width: 100%; height: auto; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+code, pre { font-family: $font-mono; font-size: 0.85em; }
+
+code {
+  background: var(--code-bg);
+  padding: 0.12em 0.34em;
+  border-radius: 3px;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  line-height: 1.6;
+
+  code { background: none; padding: 0; }
+}
+
+blockquote {
+  margin: $step 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--rule);
+  color: var(--muted);
+  font-style: italic;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: ($step * 1.5) 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: $step 0;
+  font-size: 0.9rem;
+
+  th, td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  th { font-family: $font-display; font-weight: 600; }
+}
+
+// ---------------------------------------------------------------------------
+// Layout
+// ---------------------------------------------------------------------------
+
+// Pages opt into a wider column with `wide: true` in their front matter.
+:root { --measure: #{$measure}; }
+.layout-wide { --measure: 56rem; }
+
+.content,
+.footer {
+  max-width: var(--measure);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.content {
+  flex: 1 0 auto; // pushes the footer down on short pages
+  width: 100%;
+  padding-bottom: $step * 2;
+}
+
+.footer { flex-shrink: 0; width: 100%; }
+
+// ---------------------------------------------------------------------------
+// Masthead: centred nav, tools pinned right
+// ---------------------------------------------------------------------------
+
+.masthead {
+  margin-bottom: $step * 1.75;
+}
+
+// One centred group: name, nav and tools sit together, and the rule under
+// them is the group's own border, so it is exactly as wide as the content.
+.masthead-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2.4rem;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  min-height: 3.75rem;
+  padding: 0.6rem 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.masthead-center {
+  display: flex;
+  align-items: center;
+  gap: 2.4rem;
+  min-width: 0;
+}
+
+.masthead-name {
+  font-family: $font-display;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.25s $ease;
+
+  &:hover { opacity: 0.7; }
+}
+
+.nav {
+  font-family: $font-display;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-block;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  color: var(--muted);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.25s $ease, background-color 0.25s $ease;
+
+  // The hover overlay.
+  &:hover {
+    color: var(--text);
+    background: var(--hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--link);
+    outline-offset: 1px;
+  }
+
+  &.is-current { color: var(--text); font-weight: 600; }
+
+  + .nav-link::before {
+    content: "\00b7";
+    position: absolute;
+    left: -0.22rem;
+    color: var(--rule);
+    font-weight: 500;
+    pointer-events: none;
+  }
+}
+
+.tools {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+// ---------------------------------------------------------------------------
+// Search: icon button + Spotlight-style palette
+// ---------------------------------------------------------------------------
+
+.search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.25s $ease, color 0.25s $ease;
+
+  &:hover { background: var(--hover); color: var(--text); }
+  &:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+}
+
+.search-icon { width: 1.05rem; height: 1.05rem; }
+
+.palette {
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: min(28rem, calc(100vh - 8rem));
+  padding: 0;
+  margin: 12vh auto auto;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--bg-raised);
+  color: var(--text);
+  box-shadow: 0 24px 60px var(--shadow), 0 2px 8px var(--shadow);
+  overflow: hidden;
+
+  &::backdrop {
+    background: rgba(20, 16, 10, 0.3);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+  }
+
+  &[open] { animation: palette-in 0.18s $ease both; }
+  &[open]::backdrop { animation: backdrop-in 0.22s $ease both; }
+}
+
+:root[data-theme="dark"] .palette::backdrop { background: rgba(0, 0, 0, 0.5); }
+
+@keyframes palette-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+}
+
+.palette-box { display: flex; flex-direction: column; min-height: 0; }
+
+.palette-field {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.palette-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  color: var(--muted);
+}
+
+.palette-input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: none;
+  outline: none;
+  font-family: $font-display;
+  font-size: 1rem;
+  color: var(--text);
+
+  &::placeholder { color: var(--muted); }
+  &::-webkit-search-cancel-button { -webkit-appearance: none; }
+}
+
+.palette-key,
+.palette-hint kbd {
+  padding: 0.1rem 0.34rem;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--bg);
+  font-family: $font-display;
+  font-size: 0.64rem;
+  color: var(--muted);
+}
+
+.palette-results {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  list-style: none;
+  margin: 0;
+  padding: 0.3rem;
+
+  &:empty { display: none; }
+
+  li { margin: 0; }
+}
+
+.palette-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border-radius: 7px;
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color 0.15s $ease;
+
+  &:hover, &.is-active {
+    background: var(--hover);
+    opacity: 1;
+  }
+}
+
+.palette-item-title {
+  font-family: $font-display;
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.palette-item-meta {
+  font-family: $font-display;
+  font-size: 0.7rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.palette-empty {
+  padding: 1.1rem 0.9rem;
+  margin: 0;
+  font-family: $font-display;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.palette-hint {
+  display: flex;
+  gap: 1rem;
+  margin: 0;
+  padding: 0.5rem 0.9rem;
+  border-top: 1px solid var(--rule);
+  background: var(--bg);
+  font-family: $font-display;
+  font-size: 0.68rem;
+  color: var(--muted);
+
+  span { display: inline-flex; align-items: center; gap: 0.3rem; }
+}
+
+@media screen and (max-width: 560px) {
+  .palette-hint { display: none; }
+}
+
+// ---------------------------------------------------------------------------
+// Day/night toggle
+// ---------------------------------------------------------------------------
+
+.theme-toggle {
+  position: relative;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.25s $ease, color 0.25s $ease;
+
+  &:hover { background: var(--hover); color: var(--text); }
+  &:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+}
+
+// Sun and moon are stacked; the active one turns into view, the other out.
+.theme-icon {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 1.15rem;
+  height: 1.15rem;
+  transition: opacity $fade $ease, transform $fade $ease;
+}
+
+.theme-icon--moon { opacity: 0; transform: rotate(-50deg) scale(0.5); }
+
+:root[data-theme="dark"] {
+  .theme-icon--sun { opacity: 0; transform: rotate(50deg) scale(0.5); }
+  .theme-icon--moon { opacity: 1; transform: none; }
+}
+
+// ---------------------------------------------------------------------------
+// Typography
+// ---------------------------------------------------------------------------
+
+h1, h2, h3, h4 {
+  font-family: $font-display;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: ($step * 1.5) 0 0.7rem;
+}
+
+h1 { font-size: 2.15rem; font-weight: 700; }
+h2 { font-size: 1.15rem; }
+h3 { font-size: 1rem; }
+h4 { font-size: 0.9rem; }
+
+.page-title {
+  margin-top: 0;
+  margin-bottom: $step;
+}
+
+p, ul, ol { margin: 0 0 $step; }
+
+ul, ol { padding-left: 1.3rem; }
+
+li { margin-bottom: 0.35rem; }
+
+// ---------------------------------------------------------------------------
+// Post list (Home and Writing)
+// ---------------------------------------------------------------------------
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 $step;
+
+  > li {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 0 1rem;
+    align-items: baseline;
+    padding: 0.6rem 0.7rem;
+    margin: 0 -0.7rem;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 6px;
+    transition: background-color 0.25s $ease;
+
+    &:hover { background: var(--hover); }
+  }
+
+  h3 {
+    font-family: $font-display;
+    font-size: 0.92rem;
+    font-weight: 500;
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  p {
+    margin: 0.3rem 0 0;
+    grid-column: 2;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+}
+
+.post-meta {
+  font-family: $font-display;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.post-link {
+  color: var(--text);
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ---------------------------------------------------------------------------
+// Post
+// ---------------------------------------------------------------------------
+
+.post .post-meta {
+  display: block;
+  margin: -1rem 0 $step;
+}
+
+.post-back {
+  margin-top: $step * 2;
+  padding-top: $step;
+  border-top: 1px solid var(--rule);
+  font-family: $font-display;
+  font-size: 0.82rem;
+}
+
+// ---------------------------------------------------------------------------
+// Research / CV entries
+// ---------------------------------------------------------------------------
+
+.entry-list { margin-bottom: $step; }
+
+.entry {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.4rem;
+  align-items: start;
+  padding: 1.1rem 1rem;
+  margin: 0 -1rem;
+  border-radius: 10px;
+  transition: background-color 0.3s $ease;
+
+  &:hover { background: var(--hover); }
+
+  + .entry { border-top: 1px solid var(--rule); }
+}
+
+.entry--media { grid-template-columns: 1fr 13rem; }
+
+// Semester header, then the lab as a subheader, then its entries.
+.term { margin-top: $step * 2; }
+.term:first-child { margin-top: 0; }
+
+.term-title {
+  margin: 0 0 0.9rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+  font-size: 1.6rem;
+}
+
+.term-note {
+  margin: -0.3rem 0 1rem;
+  font-family: $font-display;
+  font-size: 0.86rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+.lab { margin-bottom: 1.4rem; }
+
+.lab-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+
+  a { color: var(--text); text-decoration: none; }
+  a:hover { color: var(--link); opacity: 1; }
+}
+
+.lab-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.6rem;
+}
+
+.lab-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  font-family: $font-display;
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: background-color 0.25s $ease, color 0.25s $ease;
+
+  &:hover { background: var(--bg-raised); color: var(--text); }
+  &:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+  &[aria-expanded="true"] .entry-chevron { transform: rotate(180deg); }
+}
+
+.lab-info .entry-detail-inner p { margin: 0; line-height: 1.5; }
+
+.lab-part { color: var(--muted); font-size: 1.2rem; }
+
+.lab-part-name {
+  font-family: $font-display;
+  font-size: 1.05rem;
+  color: var(--muted);
+}
+
+.lab-info .entry-detail-inner > :first-child { margin-top: 0.2rem; }
+.lab-info .entry-detail-inner > :last-child { margin-bottom: 0.3rem; }
+
+.lab-meta {
+  margin: 0.1rem 0 0;
+  font-family: $font-display;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+.entry-title {
+  margin: 0 0 0.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.entry-venue {
+  margin: 0 0 0.6rem;
+  font-family: $font-display;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.entry-sep { opacity: 0.6; }
+
+.entry-summary {
+  margin: 0 0 0.7rem;
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+// Details disclosure --------------------------------------------------------
+
+.entry-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.55rem 0.25rem 0.4rem;
+  margin: 0 0 0.2rem -0.4rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  font-family: $font-display;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: var(--muted);
+  transition: background-color 0.25s $ease, color 0.25s $ease;
+
+  &:hover { background: var(--bg-raised); color: var(--text); }
+  &:focus-visible { outline: 2px solid var(--link); outline-offset: 1px; }
+}
+
+.entry-chevron {
+  width: 0.75rem;
+  height: 0.75rem;
+  transition: transform 0.35s $ease;
+}
+
+.entry-toggle[aria-expanded="true"] .entry-chevron { transform: rotate(180deg); }
+
+// 0fr -> 1fr animates to the content's natural height without measuring it.
+.entry-detail {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.38s $ease;
+}
+
+.entry-detail.is-open { grid-template-rows: 1fr; }
+
+.entry-detail-inner {
+  overflow: hidden;
+
+  > :first-child { margin-top: 0.4rem; }
+  > :last-child { margin-bottom: 0.7rem; }
+
+  p, ul, ol { font-size: 0.86rem; line-height: 1.7; margin-bottom: 0.7rem; }
+}
+
+// Links and tags ------------------------------------------------------------
+
+.entry-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+
+  li { margin: 0; }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    padding: 0.22rem 0.55rem;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    background: var(--bg-raised);
+    font-family: $font-display;
+    font-size: 0.75rem;
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color 0.25s $ease, color 0.25s $ease, transform 0.25s $ease;
+
+    &:hover {
+      opacity: 1;
+      color: var(--link);
+      border-color: var(--link);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.entry-link-arrow {
+  width: 0.6rem;
+  height: 0.6rem;
+  transition: transform 0.25s $ease;
+}
+
+.entry-links a:hover .entry-link-arrow { transform: translate(1px, -1px); }
+
+.entry-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.7rem;
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+
+  li {
+    margin: 0;
+    font-family: $font-display;
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+}
+
+// Media ---------------------------------------------------------------------
+
+.entry-media {
+  margin: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  background: var(--bg-raised);
+  position: relative;
+  transition: border-color 0.3s $ease, box-shadow 0.3s $ease;
+
+  img, video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform 0.45s $ease;
+  }
+
+  figcaption {
+    padding: 0.35rem 0.5rem;
+    font-family: $font-display;
+    font-size: 0.7rem;
+    color: var(--muted);
+    border-top: 1px solid var(--rule);
+  }
+}
+
+.entry:hover .entry-media {
+  box-shadow: 0 6px 18px var(--shadow);
+
+  img, video { transform: scale(1.04); }
+}
+
+.entry-media-hint {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  padding: 0.12rem 0.4rem;
+  border-radius: 999px;
+  background: var(--bg-raised);
+  border: 1px solid var(--rule);
+  font-family: $font-display;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.3s $ease;
+}
+
+.entry:hover .entry-media-hint { opacity: 1; }
+.entry-media.is-playing .entry-media-hint { opacity: 0; }
+
+// ---------------------------------------------------------------------------
+// Profile links
+// ---------------------------------------------------------------------------
+
+.social {
+  list-style: none;
+  margin: 0 0 $step;
+  padding: 0;
+}
+
+.social-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 0.3rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.55rem;
+  margin-left: -0.55rem;
+  border-radius: 6px;
+  font-family: $font-display;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color 0.25s $ease, color 0.25s $ease;
+
+  &:hover {
+    background: var(--hover);
+    opacity: 1; // cancel the global link fade
+  }
+}
+
+.social-icon {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+
+.social-note {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
+// Footer variant: icons only, in a row.
+.social--compact {
+  display: flex;
+  gap: 0.1rem;
+  margin: 0 0 0.7rem;
+
+  .social-item { margin-bottom: 0; }
+
+  .social-link {
+    padding: 0.4rem;
+    margin-left: 0;
+    color: var(--muted);
+
+    &:hover { color: var(--text); }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Footer
+// ---------------------------------------------------------------------------
+
+.footer {
+  border-top: 1px solid var(--rule);
+  padding: $step 0 ($step * 2);
+  color: var(--muted);
+  font-family: $font-display;
+  font-size: 0.75rem;
+
+  p { margin: 0; }
+
+  a {
+    color: var(--muted);
+    transition: color 0.25s $ease;
+
+    &:hover { color: var(--text); }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Small screens
+// ---------------------------------------------------------------------------
+
+// Stack once the nav and tools can no longer share a row comfortably.
+@media screen and (max-width: 860px) {
+  .masthead-inner {
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.85rem 1rem;
+  }
+
+  .masthead-center {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .nav { max-width: 100%; line-height: 2.2; }
+
+  .post-list > li {
+    grid-template-columns: 1fr;
+    gap: 0.2rem;
+  }
+
+  .post-list p { grid-column: 1; }
+
+  // Figure above the text, and wider, on a phone.
+  .entry--media { grid-template-columns: 1fr; }
+
+  .entry-media { order: -1; max-width: 20rem; }
+}
