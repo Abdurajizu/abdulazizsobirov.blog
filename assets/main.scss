@@ -8,9 +8,10 @@
 
 $font-body: "Libre Baskerville", Georgia, "Times New Roman", serif;
 $font-display: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, sans-serif;
+$font-heading: "Prata", Georgia, "Times New Roman", serif;
 $font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-$measure: 40rem; // text column width
+$measure: 52rem; // text column width
 $step: 1.6rem;   // vertical rhythm
 $ease: cubic-bezier(0.4, 0, 0.2, 1);
 $fade: 0.6s;     // day/night crossfade
@@ -201,7 +202,7 @@ table {
 
 // Pages opt into a wider column with `wide: true` in their front matter.
 :root { --measure: #{$measure}; }
-.layout-wide { --measure: 56rem; }
+.layout-wide { --measure: 64rem; }
 
 .content,
 .footer {
@@ -244,14 +245,14 @@ table {
 .masthead-center {
   display: flex;
   align-items: center;
-  gap: 2.4rem;
+  gap: 6rem;
   min-width: 0;
 }
 
 .masthead-name {
-  font-family: $font-display;
+  font-family: $font-heading;
   font-size: 0.98rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: -0.01em;
   color: var(--text);
   text-decoration: none;
@@ -262,9 +263,9 @@ table {
 }
 
 .nav {
-  font-family: $font-display;
+  font-family: $font-heading;
   font-size: 0.92rem;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.02em;
   text-align: center;
 }
@@ -290,7 +291,7 @@ table {
     outline-offset: 1px;
   }
 
-  &.is-current { color: var(--text); font-weight: 600; }
+  &.is-current { color: var(--text); background: var(--hover); }
 
   + .nav-link::before {
     content: "\00b7";
@@ -520,16 +521,17 @@ table {
 // ---------------------------------------------------------------------------
 
 h1, h2, h3, h4 {
-  font-family: $font-display;
-  font-weight: 600;
+  font-family: $font-heading;
+  font-weight: 400; // Prata ships one weight; avoid faux bold
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin: ($step * 1.5) 0 0.7rem;
 }
 
-h1 { font-size: 2.15rem; font-weight: 700; }
-h2 { font-size: 1.15rem; }
-h3 { font-size: 1rem; }
+h1 { font-size: 1.9rem; }
+h2, h3 { font-weight: 700; }
+h2 { font-size: 1.05rem; }
+h3 { font-size: 0.95rem; }
 h4 { font-size: 0.9rem; }
 
 .page-title {
@@ -559,6 +561,160 @@ li { margin-bottom: 0.35rem; }
   }
 
   dd { margin: 0.2rem 0 0; }
+}
+
+// About page sections, divided by rules
+.about-section {
+  margin-top: $step * 2;
+  padding-top: 0.2rem;
+  border-top: 1px solid var(--rule);
+
+  > h2:first-child { margin-top: 1.1rem; }
+}
+
+// Home
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: $step * 1.3;
+}
+
+.hero-photo {
+  max-width: 100%;
+  flex: none;
+  width: 14.25rem;
+  height: 14.25rem;
+  object-fit: cover;
+  object-position: 50% 20%;
+}
+
+.hero-text { min-width: 0; }
+
+.hero-name { margin: 0 0 0.3rem; font-size: 2rem; }
+
+.hero-sub {
+  margin: 0 0 1rem;
+  font-family: $font-display;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+}
+
+.hero-summary { margin: 0 0 1rem; }
+
+.hero-links {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.9rem;
+  margin-left: -0.4rem; // optically align the first icon with the text
+
+  .social { margin: 0; }
+}
+
+.hero-mail {
+  font-family: $font-display;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-decoration: none;
+
+  &:hover { color: var(--text); opacity: 1; }
+}
+
+// Each section sits under its own rule.
+.home-section {
+  padding-top: 1.1rem;
+  margin-bottom: 1.4rem;
+  border-top: 1px solid var(--rule);
+}
+
+.home-heading { margin: 0 0 0.5rem; font-size: 1.05rem; }
+
+.home-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li { margin: 0 0 0.9rem; }
+  li:last-child { margin-bottom: 0; }
+  p { margin: 0.1rem 0 0; font-size: 0.88rem; color: var(--muted); }
+}
+
+.home-latest {
+  font-size: 0.8rem !important;
+
+  span {
+    margin-right: 0.35rem;
+    font-family: $font-display;
+    font-size: 0.66rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+.home-link {
+  font-family: $font-heading;
+  font-size: 1.05rem;
+  color: var(--text);
+  text-decoration: none;
+
+  &:hover { color: var(--link); opacity: 1; }
+}
+
+.updates {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: grid;
+    grid-template-columns: 5.6rem 1fr;
+    gap: 0 0.6rem;
+    margin: 0;
+    padding: 0.28rem 0;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+}
+
+.updates-date {
+  font-family: $font-display;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding-top: 0.12rem;
+}
+
+@media screen and (max-width: 560px) {
+  .hero { flex-direction: column; align-items: flex-start; gap: 1.2rem; }
+  .updates li { grid-template-columns: 1fr; }
+}
+
+// Back to top (in the footer on every page)
+.back-to-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0.3rem 0.75rem 0.3rem 0.55rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--bg-raised);
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.25s $ease, border-color 0.25s $ease, transform 0.25s $ease;
+
+  svg { width: 0.75rem; height: 0.75rem; }
+
+  &:hover { color: var(--text); border-color: var(--link); transform: translateY(-1px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
 }
 
 // Post list (Home and Writing)
@@ -662,7 +818,7 @@ li { margin-bottom: 0.35rem; }
   margin: 0 0 0.9rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--rule);
-  font-size: 1.6rem;
+  font-size: 1.4rem;
 }
 
 .term-note {
@@ -677,8 +833,8 @@ li { margin-bottom: 0.35rem; }
 
 .lab-title {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 400;
 
   a { color: var(--text); text-decoration: none; }
   a:hover { color: var(--link); opacity: 1; }
@@ -733,8 +889,8 @@ li { margin-bottom: 0.35rem; }
 
 .entry-title {
   margin: 0 0 0.2rem;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 400;
   letter-spacing: 0;
 }
 
@@ -744,6 +900,10 @@ li { margin-bottom: 0.35rem; }
   font-size: 0.8rem;
   color: var(--muted);
 }
+
+.project-section { margin-top: $step * 2; }
+
+.entry-authors { margin-top: -0.4rem; }
 
 .entry-sep { opacity: 0.6; }
 
@@ -878,6 +1038,7 @@ li { margin-bottom: 0.35rem; }
     width: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
+    object-position: 50% 0;
     transition: transform 0.45s $ease;
   }
 
@@ -1004,6 +1165,11 @@ li { margin-bottom: 0.35rem; }
 // ---------------------------------------------------------------------------
 // Small screens
 // ---------------------------------------------------------------------------
+
+// Between stacking and full width, pull the name back toward the nav.
+@media screen and (max-width: 1180px) {
+  .masthead-center { gap: 2.4rem; }
+}
 
 // Stack once the nav and tools can no longer share a row comfortably.
 @media screen and (max-width: 860px) {

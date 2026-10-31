@@ -34,23 +34,6 @@
     });
   }
 
-  // Follow the OS setting until the visitor picks a theme themselves.
-  if (window.matchMedia) {
-    var query = window.matchMedia('(prefers-color-scheme: dark)');
-    var onChange = function (event) {
-      try {
-        if (localStorage.getItem('theme')) { return; }
-      } catch (e) { /* fall through */ }
-      root.setAttribute('data-theme', event.matches ? 'dark' : 'light');
-      syncToggle();
-    };
-    if (query.addEventListener) {
-      query.addEventListener('change', onChange);
-    } else if (query.addListener) {
-      query.addListener(onChange);
-    }
-  }
-
   // -------------------------------------------------------------------------
   // Research entries: details disclosure + hover-to-play video
   // -------------------------------------------------------------------------

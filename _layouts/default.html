@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ page.lang | default: site.lang | default: 'en' }}">
   {%- include head.html -%}
-  <body{% if page.wide %} class="layout-wide"{% endif %}>
+  <body id="top"{% if page.wide %} class="layout-wide"{% endif %}>
     {%- include header.html -%}
     <main class="content">
       {{ content }}

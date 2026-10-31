@@ -48,15 +48,17 @@ sass:
 collections:
   research:
     output: false
+  projects:
+    output: false
 
 # Order of the links in the site header.
 header_pages:
   - index.markdown
-  - about.markdown
   - projects.markdown
   - research.markdown
   - writing.markdown
   - resume.markdown
+  - about.markdown
 
 exclude:
   - about_me.md
