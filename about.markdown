@@ -47,7 +47,7 @@ I am a board member of the Central Asian Students Association at Harvard and hav
   <dd>Machine Learning (undergraduate), Machine Learning (graduate, at MIT), Data Science I.</dd>
 
   <dt>Statistics</dt>
-  <dd>Intro to Probability Theory (Stat 110).</dd>
+  <dd>Intro to Probability (Stat 110).</dd>
 
   <dt>Other</dt>
   <dd>Central Asia in Global Politics; Reimagining Global Health: Who Lives, Who Dies, Who Cares?; Sea Monsters (First-Year Seminar); two writing courses; Video-Game Storytelling and Creativity.</dd>
